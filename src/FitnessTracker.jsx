@@ -958,6 +958,34 @@ function Dashboard({ history, prs, onStartDay, onOpenPRs }) {
         >
           12-Week Rebuild
         </h1>
+        {/* BOTÓN SECRETO DE ACTUALIZACIÓN FORZADA */}
+        <button 
+          onClick={() => {
+            // Borra cachés del navegador si existieran y recarga la página de cero
+            if (window.location) {
+              window.location.reload(true);
+            }
+          }}
+          style={{
+            marginTop: '8px',
+            background: COLORS.surfaceAlt,
+            border: `1px solid ${COLORS.border}`,
+            color: COLORS.textSecondary,
+            padding: '5px 10px',
+            borderRadius: '4px',
+            fontSize: '11px',
+            fontFamily: "Barlow, sans-serif",
+            fontWeight: 600,
+            cursor: 'pointer'
+          }}
+        >
+          🔄 Sincronizar Cambios
+        </button>
+
+        <p className="text-sm mt-2" style={{ color: COLORS.textSecondary }}>
+          Muscle gain + hip &amp; pelvic alignment
+        </p>
+      </div>
         <p className="text-sm mt-1" style={{ color: COLORS.textSecondary }}>
           Muscle gain + hip &amp; pelvic alignment
         </p>
