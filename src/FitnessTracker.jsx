@@ -2117,8 +2117,17 @@ export default function FitnessTracker() {
   }, [session]);
 
   function startRestTimer(seconds, label) {
-    setRestTimer({ secondsLeft: seconds, totalSeconds: seconds, label, justFinished: false });
+    // Calculamos el timestamp exacto (en milisegundos) de cuándo debe terminar
+    const endTime = Date.now() + (seconds * 1000);
+    setRestTimer({ 
+      secondsLeft: seconds, 
+      totalSeconds: seconds, 
+      label, 
+      justFinished: false,
+      endTime: endTime // <-- Guardamos este punto de referencia fijo
+    });
   }
+
 
   useEffect(() => {
     if (!restTimer) return;
@@ -2126,16 +2135,35 @@ export default function FitnessTracker() {
       const t = setTimeout(() => setRestTimer(null), 2500);
       return () => clearTimeout(t);
     }
+
+    // Si ya llegó a cero por cálculos previos, activamos el final
     if (restTimer.secondsLeft <= 0) {
       triggerRestFinishedFeedback();
       setRestTimer((rt) => (rt ? { ...rt, justFinished: true } : rt));
       return;
     }
+
+    // Este ciclo se ejecuta constantemente para refrescar la pantalla
     const t = setTimeout(() => {
-      setRestTimer((rt) => (rt ? { ...rt, secondsLeft: rt.secondsLeft - 1 } : rt));
+      setRestTimer((rt) => {
+        if (!rt || rt.justFinished) return rt;
+        
+        // Calculamos los segundos reales que quedan comparando con el reloj del iPhone
+        const now = Date.now();
+        const exactSecondsLeft = Math.max(0, Math.round((rt.endTime - now) / 1000));
+        
+        // Si el tiempo ya expiró mientras la app estaba dormida
+        if (exactSecondsLeft <= 0) {
+          return { ...rt, secondsLeft: 0 };
+        }
+        
+        return { ...rt, secondsLeft: exactSecondsLeft };
+      });
     }, 1000);
+
     return () => clearTimeout(t);
   }, [restTimer]);
+
 
   function startDay(dayId) {
     setSession(buildSessionFromPlan(dayId, history));
