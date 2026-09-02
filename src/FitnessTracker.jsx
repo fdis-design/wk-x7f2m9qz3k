@@ -986,10 +986,6 @@ function Dashboard({ history, prs, onStartDay, onOpenPRs }) {
           Muscle gain + hip &amp; pelvic alignment
         </p>
       </div>
-        <p className="text-sm mt-1" style={{ color: COLORS.textSecondary }}>
-          Muscle gain + hip &amp; pelvic alignment
-        </p>
-      </div>
 
       <Card className="p-3.5" style={{ borderLeft: `3px solid ${COLORS.blue}` }}>
         <div className="flex items-center justify-between mb-1.5">
