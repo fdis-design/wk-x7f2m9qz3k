@@ -668,10 +668,24 @@ function fmtElapsed(totalSeconds) {
 // Android Chrome; iOS Safari does not expose the Vibration API to web pages
 // as of this writing, so this is a no-op there) plus a short audio beep as
 // a cross-platform fallback so there's always some signal.
+// Alerta háptica y sonora optimizada exclusivamente para iOS Safari / PWA
 function triggerRestFinishedFeedback() {
+  // 1. Truco Háptico: Forzamos al Taptic Engine simulando clics en el switch oculto
   try {
-    if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
-  } catch (e) {}
+    const trigger = document.getElementById("ios-haptic-trigger");
+    if (trigger) {
+      let pulses = 0;
+      const interval = setInterval(() => {
+        trigger.click(); 
+        pulses++;
+        if (pulses >= 3) clearInterval(interval); // Da 3 vibraciones rápidas de alerta
+      }, 100); 
+    }
+  } catch (e) {
+    console.error("Error en vibración iOS:", e);
+  }
+
+  // 2. Respaldo de sonido: El pitido que ya tenías (ideal por si no tienes el iPhone en la mano)
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (AudioCtx) {
@@ -690,6 +704,7 @@ function triggerRestFinishedFeedback() {
     }
   } catch (e) {}
 }
+
 
 function startOfWeek(date) {
   const d = new Date(date);
@@ -2185,6 +2200,18 @@ export default function FitnessTracker() {
         fontFamily: "Barlow, sans-serif",
       }}
     >
+       {/* IMPLEMENTACIÓN HÁPTICA PARA IOS: Switch nativo oculto */}
+      <input 
+        type="checkbox" 
+        id="ios-haptic-trigger" 
+        style={{ 
+          position: "absolute", 
+          opacity: 0, 
+          pointerEvents: "none", 
+          width: 0, 
+          height: 0 
+        }} 
+      />
       <style>{`
         @import url('${FONT_IMPORT_URL}');
         * { box-sizing: border-box; }
